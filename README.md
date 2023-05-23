@@ -26,11 +26,10 @@ We provide protocols for performing  **model selection**, **feature selection** 
 
 ## Background
 For a counter distribution on non-negative integers with probability mass function (PMF) $f(y)$, e.g., Poisson, negative binomial, its **hurdle model** can be expressed as 
-$$Pr(Y=0)=\pi, \,\,Pr(Y=y)=(1-\pi)\frac{f(y)}{1-f(0)},\,y>0.$$
+$$Pr(Y=0)=\pi, Pr(Y=y)=(1-\pi)\frac{f(y)}{1-f(0)},y>0.$$
 
 Its **zero-inflated model** can be written as 
-        $$Pr(Y=0)=\pi+(1-\pi)f(0),\,\,
-        Pr(Y=y)=(1-\pi)f(y),\,y>0.$$
+$$Pr(Y=0)=\pi+(1-\pi)f(0),Pr(Y=y)=(1-\pi)f(y),y>0.$$
 
 
 ## Installation

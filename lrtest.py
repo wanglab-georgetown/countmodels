@@ -28,7 +28,7 @@ class LRTest:
         self.nb_features = list(set(nb_features) - set(conditions))
         self.num_sample, self.num_out = np.shape(self.df_data)
 
-        if infl_features is not None:  # and len(infl_features) > 0
+        if infl_features is not None:
             self.infl_features = list(set(infl_features) - set(conditions))
             self._no_infl = False
         else:

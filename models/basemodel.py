@@ -54,9 +54,6 @@ class BaseModel:
         self.df_model = df_model
         self.model_path = model_path
 
-        # if not hasattr(Poi, "stan_model"):
-        #     Poi.stan_model = self.get_stan_model()  # class/static variable
-
         # class/static variable
         if not hasattr(self.__class__, "model_name"):
             self.__class__.model_name = self.__class__.__name__.lower()
@@ -139,7 +136,6 @@ class BaseModel:
                     find_sol = True
                     break
                 except Exception as e:
-                    # print("_logit_fit error, {}, {}".format(method, e))
                     continue
 
         res = {}

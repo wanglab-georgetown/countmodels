@@ -10,7 +10,7 @@ The purpose of this repo is
 
 This can be used as an alternative to `statsmodels` for Hurdle and Zero-inflated count models.
 
-The following 7 models are supported, along with supported methods for each model given in `[]`. `stan` denotes `PyStan`, `statsmodels` denotes `statsmodels`, and `tensorflow` denotes [`TensorZINB`](https://github.com/wanglab-georgetown/tensorzinb/tree/main/tensorzinb)
+The following 7 models are supported, along with supported methods for each model given in `[]`. `stan` denotes `PyStan`, `statsmodels` denotes `statsmodels`, and `tensorflow` denotes [`TensorZINB`](https://github.com/wanglab-georgetown/tensorzinb)
 :
 
 ``` r
@@ -35,7 +35,7 @@ $$Pr(Y=0)=\pi+(1-\pi)f(0),Pr(Y=y)=(1-\pi)f(y),y>0.$$
 
 ## Installation
 
-No installation is required to use this repo. It is recommended to run `pip install -r requirements.txt` to install the required packages. To use the `tensorflow` method, you need to install [`TensorZINB`](https://github.com/wanglab-georgetown/tensorzinb/tree/main/tensorzinb). For Apple silicon (M1, M2, etc), it is recommended to install `tensorflow` by following the command in the Troubleshooting section below.
+No installation is required to use this repo. It is recommended to run `pip install -r requirements.txt` to install the required packages. To use the `tensorflow` method, you need to install [`TensorZINB`](https://github.com/wanglab-georgetown/tensorzinb). For Apple silicon (M1, M2, etc), it is recommended to install `tensorflow` by following the command in the Troubleshooting section below.
 
 ## Model Specifications
 ### Model Class

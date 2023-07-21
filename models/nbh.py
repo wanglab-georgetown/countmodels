@@ -18,45 +18,6 @@ class NBH(NB):
         # dispersion parameter
         self.df_model = self.df_model + 1
 
-    # def _stan_code(self):
-    #     stan_code = """
-    #         data{
-    #             int N;
-    #             int K;
-    #             matrix[N, K] X;
-    #             int Y[N];
-    #         }
-    #         parameters{
-    #             vector[K] beta;
-    #             real log_alpha;
-    #         }
-    #         model{
-    #             vector[N] a;
-    #             real b;
-    #             # covariates transformation
-    #             a = exp(X * beta);
-    #             b = exp(log_alpha);
-
-    #             # likelihood
-    #             for (i in 1:N) Y[i] ~ neg_binomial(a[i], b) T[1,];
-    #         }
-    #         generated quantities {
-    #           real log_lik;
-    #           vector[N] log_a;
-    #           real b;
-    #           log_a = X * beta;
-    #           b = exp(log_alpha);
-    #           log_lik = 0;
-    #           for (i in 1:N){
-    #             real a = exp(log_a[i]) ;
-    #             log_lik += lgamma(a+Y[i])-lgamma(a)-lgamma(Y[i]+1)+a*log_alpha-(Y[i]+a)*log1p_exp(log_alpha)-log1m_exp(a*(log(b)-log(b+1)));
-    #           }
-    #         }
-    #         """
-    #     # the above code is a robust implementation of the following line
-    #     # log_lik += neg_binomial_lpmf(Y[i] | a, b) - log(1-exp(neg_binomial_lpmf(0 | a, b)));
-    #     return stan_code
-
     def _stan_code(self):
         stan_code = """
             data{

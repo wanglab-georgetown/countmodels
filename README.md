@@ -3,7 +3,7 @@
 ## Overview
 The purpose of this repo is
 
-- to provide numerically stable implementations of hurdle and zero-inflated count models in stan (`Pystan`) and TensorFlow (`TensorZINB`).
+- to provide numerically stable implementations of hurdle and zero-inflated count models in stan (`Pystan`) and TensorFlow ([`TensorZINB`](https://github.com/wanglab-georgetown/tensorzinb)).
 - to provide a framework to compare different hurdle and zero-inflated count models.
 - to provide a framework for scRNA-seq DEG analysis using different count models.
 - to provide a framework for model selection and feature selection for count models.
@@ -31,6 +31,24 @@ $$Pr(Y=0)=\pi, Pr(Y=y)=(1-\pi)\frac{f(y)}{1-f(0)},y>0.$$
 
 Its **zero-inflated model** can be written as 
 $$Pr(Y=0)=\pi+(1-\pi)f(0),Pr(Y=y)=(1-\pi)f(y),y>0.$$
+
+Models supported are given in the table below.
+
+| Count models      | $f(y)$                                                                                                                                 | Original | Hurdle | Zero-inflated |
+|:-------------------:|:----------------------------------------------------------------------------------------------------------------------------------------:|:----------:|:--------:|:---------------:|
+| Poisson           |$\frac\{\mu^y e^\{-\mu\}\}\{y!\}$                                                                                                            | P        | PH     | ZIP           |
+| Negative Binomial | $\frac\{\Gamma(y+\theta)\}\{\Gamma(\theta)\Gamma(y+1)\}\left( \frac\{\theta\}\{\theta+\mu\}\right)^\theta\left(\frac\{\mu\}\{\theta+\mu\}\right)^y$ | NB       | NBH    | ZINB          |
+| Normal            | $\mathcal\{N\}(\mu,\sigma^2)$                                                                                                            |          | MAST   |               |
+
+We use the following model parameterization
+$$
+        \log \mu_g =X_{\mu}\beta_{g,\mu}, \\
+        logit \pi_g =X_{\pi}\beta_{g,\pi}, \\ \log \theta_g = \beta_{g,\theta},
+$$
+where $\mu_g$ is the mean of subject $g$, $X_{\mu}$, $X_{\pi}$ are feature matrices, $\beta_{g,\mu}$ and $\beta_{g,\pi}$ are coefficients for each subject $g$.
+
+MAST assumes a transformation of the discrete count variable $y$ to be a continuous normal random variable $z$. In the case of the commonly used log transformation, we have
+$z=g(y)=\log_2(1+\gamma y)$. We calculate the log likelihood of MAST by determining the equivalent probability mass function (PMF) of $y$ based on the probability density function (PDF) of $z$.
 
 
 ## Installation
@@ -85,7 +103,7 @@ model.fit(
 
 `LRTest` provides a wrapper for LRT. It runs the likelihood ratio test by computing the log likelihood difference with and without using conditions in the given model. It automatically generates a feature matrix and removes dependent feature columns.
 
-To import this class, run `from lrtest import LRTest` (see `DEG_analysis.ipynb` for an example). To construct a `LRTest` object, run
+To import this class, run `from lrtest import LRTest` (see [`DEG_analysis.ipynb`](DEG_analysis.ipynb) for an example). To construct a `LRTest` object, run
 ``` r
 lrtest = LRTest(
     model_class,             # model class from `Poi`, `NB`, `PoiH`, `NBH`, `ZIPoi`, `ZINB`, `MAST`
@@ -110,23 +128,23 @@ lrtest.run(
 `lrtest.run` returns a result dataframe `dfr` with columns:
 ``` r
 [
-	"llf0":                  # log likelihood without conditions
-	"aic0":                  # AIC without conditions
-	"df0":                   # degree of freedom without conditions
-	"cpu_time0":             # computing time for each subject without conditions
-	"llf1":                  # log likelihood without conditions
-	"aic1":                  # AIC with conditions
-	"df1":                   # degree of freedom with conditions
-	"cpu_time1":             # computing time for each subject with conditions
-	"llfd":                  # ll1 - ll0
-	"aicd":                  # aic1 - aic0
-	"pvalue":                # p-value: 1 - stats.chi2.cdf(2 * lld, df1 - df0)
+    "llf0":                  # log likelihood without conditions
+    "aic0":                  # AIC without conditions
+    "df0":                   # degree of freedom without conditions
+    "cpu_time0":             # computing time for each subject without conditions
+    "llf1":                  # log likelihood without conditions
+    "aic1":                  # AIC with conditions
+    "df1":                   # degree of freedom with conditions
+    "cpu_time1":             # computing time for each subject with conditions
+    "llfd":                  # ll1 - ll0
+    "aicd":                  # aic1 - aic0
+    "pvalue":                # p-value: 1 - stats.chi2.cdf(2 * lld, df1 - df0)
 ]
 ```
 
 We can further correct the pvalues for multiple testing by calling `utils.correct_pvalues_for_multiple_testing(dfr['pvalue'])`.
 
-We also call `lrtest.run_condition` to get results from with conditions only (useful for feature selection. see `feature_selection.ipynb` for an example).
+We also call `lrtest.run_condition` to get results from with conditions only (useful for feature selection. see [`feature_selection.ipynb`](feature_selection.ipynb) for an example).
 ``` r
 lrtest.run_condition(
     method,                  # method for solving the model
@@ -145,26 +163,29 @@ We provide notebooks on how to perform **model selection**, **feature selection*
 
 ### Model selection
 
-`model_selection.ipynb` runs all 7 models across all supported methods for each model on the sample dataset. log likelihood (llf), Akaike information criterion (AIC) and average computing time are compared.
+[`model_selection.ipynb`](model_selection.ipynb) runs all 7 models across all supported methods for each model on the sample dataset. log likelihood (llf), Akaike information criterion (AIC) and average computing time are compared.
 
 ### Feature selection
 
-`feature_selection.ipynb` runs the `topdown` or `bottomup` algorithm to successively remove or add a feature based on AIC. We also show how to remove redundant features before performing feature selection.
+[`feature_selection.ipynb`](feature_selection.ipynb) runs the `topdown` or `bottomup` algorithm to successively remove or add a feature based on AIC. We also show how to remove redundant features before performing feature selection.
 
 ### DEG analysis
 
-`DEG_analysis.ipynb` performs DEG analysis through `LRTest` using one of the 7 supported models.
+[`DEG_analysis.ipynb`](DEG_analysis.ipynb) performs DEG analysis through `LRTest` using one of the 7 supported models.
 
 ### R code
 
-For comparison, the following two notebooks in `\R` folder solve the ZINB model using R packages:
+For comparison, the following two notebooks in [`./R`](R/) folder solve the ZINB model using R packages:
 
 `R/ZINB_WaVE_R.ipynb`: ZINB_WaVE solver  
 `R/VGAM_R.ipynb`: VGAM solver
 
+To run `R` in Jupyter Notebook, please refer to the examples in [R2Jupyter](https://github.com/wanglab-georgetown/R2Jupyter).
+
+
 ## Tests
 
-In `./tests`, we provide tests for each of the 7 models: 
+In [`./tests`](tests/), we provide tests for each of the 7 models: 
 
 - cross validate the supported methods `stan`, `statsmodels`, or `tensorflow` returning similar results on simulation data. 
 - show simulation examples where `statsmodels` incurs numerical errors.
@@ -182,31 +203,13 @@ To run TensorFlow on Apple silicon (M1, M2, etc), install TensorFlow using the f
 `python -m pip install tensorflow-metal==0.5.1`
 
 
+If `pystan` cannot be installed, try using `pystan==2.19.1.1` or create a new conda environment using the following:
+
+`conda create --name countmodels python==3.9.13 pystan==2.19.1.1`
+
+
 ## References
-Cui, T., Wang, T. A Comprehensive Assessment of Hurdle and Zero-inflated Models for Single Cell RNA-sequencing Analysis (2023).
+Cui, T., Wang, T. A Comprehensive Assessment of Hurdle and Zero-inflated Models for Single Cell RNA-sequencing Analysis, Briefings in Bioinformatics, 2023.
 
 ## Support and Contribution
-For technical issues particular to this repo, please report the issue on this GitHub repository.
-
-
-<!-- ``` r
-Poi:   Poisson
-NB:    Negative Binomial
-PoiH:  Poisson Hurdle
-NBH:   Negative Binomial Hurdle
-ZIPoi: Zero-inflated Poisson
-ZINB:  Zero-inflated Negative Binomial 
-MAST:  Normal Hurdle
-```
-
-``` r
-methods={
-    Poi: ['stan','statsmodels'],
-    NB: ['stan','statsmodels','tensorflow'],
-    PoiH: ['stan','statsmodels'],
-    NBH: ['stan','statsmodels'],
-    ZIPoi: ['stan','statsmodels'],
-    ZINB: ['stan','statsmodels','tensorflow'],
-    MAST: ['statsmodels'],
-}
-```  -->
+If you encounter any bugs while using the code, please don't hesitate to create an issue on GitHub here.

@@ -32,6 +32,14 @@ $$Pr(Y=0)=\pi, Pr(Y=y)=(1-\pi)\frac{f(y)}{1-f(0)},y>0.$$
 Its **zero-inflated model** can be written as 
 $$Pr(Y=0)=\pi+(1-\pi)f(0),Pr(Y=y)=(1-\pi)f(y),y>0.$$
 
+We use the following model parameterization
+
+$$
+\log \mu_g =X_{\mu}\beta_{g,\mu},\,logit \pi_g =X_{\pi}\beta_{g,\pi}, \,\log \theta_g = \beta_{g,\theta},
+$$
+
+where $\mu_g$ is the mean of subject $g$, $X_{\mu}$, $X_{\pi}$ are feature matrices, $\beta_{g,\mu}$ and $\beta_{g,\pi}$ are coefficients for each subject $g$.
+
 Models supported are given in the table below.
 
 | Count models      | $f(y)$                                                                                                                                 | Original | Hurdle | Zero-inflated |
@@ -39,13 +47,6 @@ Models supported are given in the table below.
 | Poisson           |$\frac\{\mu^y e^\{-\mu\}\}\{y!\}$                                                                                                            | P        | PH     | ZIP           |
 | Negative Binomial | $\frac\{\Gamma(y+\theta)\}\{\Gamma(\theta)\Gamma(y+1)\}\left( \frac\{\theta\}\{\theta+\mu\}\right)^\theta\left(\frac\{\mu\}\{\theta+\mu\}\right)^y$ | NB       | NBH    | ZINB          |
 | Normal            | $\mathcal\{N\}(\mu,\sigma^2)$                                                                                                            |          | MAST   |               |
-
-We use the following model parameterization
-$$
-        \log \mu_g =X_{\mu}\beta_{g,\mu},
-        logit \pi_g =X_{\pi}\beta_{g,\pi}, \log \theta_g = \beta_{g,\theta},
-$$
-where $\mu_g$ is the mean of subject $g$, $X_{\mu}$, $X_{\pi}$ are feature matrices, $\beta_{g,\mu}$ and $\beta_{g,\pi}$ are coefficients for each subject $g$.
 
 MAST assumes a transformation of the discrete count variable $y$ to be a continuous normal random variable $z$. In the case of the commonly used log transformation, we have
 $z=g(y)=\log_2(1+\gamma y)$. We calculate the log likelihood of MAST by determining the equivalent probability mass function (PMF) of $y$ based on the probability density function (PDF) of $z$.

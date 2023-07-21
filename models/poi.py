@@ -12,7 +12,31 @@ class Poi(BaseModel):
         super(Poi, self).__init__(endog, exog, exog_infl=None, model_path=model_path)
 
     def _stan_code(self):
-        stan_code = ""
+        stan_code = """
+            data{
+                int N;
+                int K;
+                matrix[N,K] X;
+                int Y[N];
+            }
+            parameters{
+                vector[K] beta;
+            }
+            transformed parameters{
+                vector[N] mu;
+                mu = exp(X * beta);
+            }
+            model{ 
+                Y ~ poisson(mu);
+            }
+            generated quantities {
+                real log_lik;
+                log_lik = 0;
+                for (i in 1:N) {
+                    log_lik += poisson_lpmf(Y[i]|mu[i]);
+                }
+            }
+            """
         return stan_code
 
     def _statsmodel_fit(

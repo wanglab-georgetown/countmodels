@@ -15,7 +15,34 @@ class PoiH(BaseModel):
         )
 
     def _stan_code(self):
-        stan_code = ""
+        stan_code = """
+            data{
+                int N;
+                int K;
+                matrix[N, K] X;
+                int Y[N];
+            }
+            parameters{
+                vector[K] beta;
+            }
+            transformed parameters{
+                vector[N] mu;
+                mu = exp(X * beta);
+            }
+            model{
+                for (i in 1:N) Y[i] ~ poisson(mu[i]) T[1,];
+            }
+            generated quantities {
+              real log_lik;
+              log_lik = 0;
+              for (i in 1:N){
+                log_lik += -lgamma(Y[i]+1)+Y[i]*log(mu[i])-mu[i]-log1m_exp(-mu[i]);
+              }
+            }
+            """
+
+        # the above code is a robust implementation of the following line
+        # log_lik += poisson_lpmf(Y[i] | mu[i]) - log(1-exp(poisson_lpmf(0 | mu[i])));
         return stan_code
 
     def _statsmodel_fit(

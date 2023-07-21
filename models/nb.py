@@ -16,7 +16,35 @@ class NB(BaseModel):
         self.df_model = self.df_model + 1
 
     def _stan_code(self):
-        stan_code = ""
+        stan_code = """
+            data{
+                int N;
+                int K;
+                matrix[N,K] X;
+                int Y[N];
+            }
+            parameters{
+                vector[K] beta;
+                real<lower=-30, upper=30> log_alpha;
+            }
+            transformed parameters{
+                vector[N] mu;
+                real alpha;
+            
+                mu = exp(X * beta);
+                alpha = exp(log_alpha);
+            }
+            model{ 
+                Y ~ neg_binomial_2(mu, alpha);
+            }
+            generated quantities {
+                real log_lik;
+                log_lik = 0;
+                for (i in 1:N) {
+                    log_lik += neg_binomial_2_lpmf(Y[i]| mu[i], alpha);
+                }
+            }
+            """
         return stan_code
 
     def _statsmodel_fit(

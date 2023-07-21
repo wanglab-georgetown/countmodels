@@ -19,7 +19,58 @@ class ZINB(NB):
         self.df_model = self.df_model + 1
 
     def _stan_code(self):
-        stan_code = ""
+        stan_code = """
+            data{
+                int N;
+                int Kb;
+                int Kc;
+                matrix[N, Kb] Xb;
+                matrix[N, Kc] Xc;
+                int Y[N];
+            }
+            parameters{
+                vector[Kc] beta;
+                vector[Kb] gamma;
+                real<lower=-30, upper=30> log_alpha;
+            }
+            transformed parameters{
+                vector[N] mu;
+                vector[N] Pi;
+
+                mu = exp(Xc * beta);
+                for (i in 1:N) Pi[i] = inv_logit(Xb[i] * gamma);
+            }
+            model{
+                vector[N] LL;
+                real alpha = exp(log_alpha);
+                for (i in 1:N) {
+                    if (Y[i] == 0) {
+                        LL[i] = log_sum_exp(bernoulli_lpmf(1| Pi[i]), 
+                                           bernoulli_lpmf(0| Pi[i]) + 
+                                           neg_binomial_2_lpmf(Y[i]| mu[i], alpha));
+                    } else {
+                        LL[i] = bernoulli_lpmf(0| Pi[i]) + 
+                                           neg_binomial_2_lpmf(Y[i]| mu[i], alpha);
+                    }
+                }
+                target += LL;
+            }
+            generated quantities {
+                real log_lik;
+                real alpha = exp(log_alpha);
+                log_lik = 0;
+                for (i in 1:N) {
+                    if (Y[i] == 0) {
+                        log_lik += log_sum_exp(bernoulli_lpmf(1| Pi[i]), 
+                                           bernoulli_lpmf(0| Pi[i]) + 
+                                           neg_binomial_2_lpmf(Y[i]| mu[i], alpha));
+                    } else {
+                        log_lik += bernoulli_lpmf(0| Pi[i]) + 
+                                           neg_binomial_2_lpmf(Y[i]| mu[i], alpha);
+                    }
+                }
+            }
+            """
         return stan_code
 
     def _statsmodel_fit(

@@ -10,7 +10,56 @@ from .suppress_stdout_stderr import suppress_stdout_stderr
 
 class ZIPoi(BaseModel):
     def _stan_code(self):
-        stan_code = ""
+        stan_code = """
+            data{
+                int N;
+                int Kb;
+                int Kc;
+                matrix[N, Kb] Xb;
+                matrix[N, Kc] Xc;
+                int Y[N];
+            }
+            parameters{
+                vector[Kc] beta;
+                vector[Kb] gamma;
+            }
+            transformed parameters{
+                vector[N] mu;
+                vector[N] Pi;
+
+                mu = exp(Xc * beta);
+                for (i in 1:N) Pi[i] = inv_logit(Xb[i] * gamma);
+            }
+            model{
+                real LL[N];
+                for (i in 1:N) {
+                    if (Y[i] == 0) {
+                        LL[i] = log_sum_exp(bernoulli_lpmf(1|Pi[i]), 
+                                           bernoulli_lpmf(0|Pi[i]) + 
+                                           poisson_lpmf(Y[i]|mu[i]));
+                    } else {
+                        LL[i] = bernoulli_lpmf(0|Pi[i]) +
+                                           poisson_lpmf(Y[i]|mu[i]);
+                    }
+                }
+                
+                target += LL;
+            }
+            generated quantities {
+                real log_lik;
+                log_lik = 0;
+                for (i in 1:N) {
+                    if (Y[i] == 0) {
+                        log_lik += log_sum_exp(bernoulli_lpmf(1|Pi[i]), 
+                                           bernoulli_lpmf(0|Pi[i]) + 
+                                           poisson_lpmf(Y[i]|mu[i]));
+                    } else {
+                        log_lik += bernoulli_lpmf(0|Pi[i]) +
+                                           poisson_lpmf(Y[i]|mu[i]);
+                    }
+                }
+            }
+            """
         return stan_code
 
     def _statsmodel_fit(

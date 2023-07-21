@@ -42,8 +42,8 @@ Models supported are given in the table below.
 
 We use the following model parameterization
 $$
-        \log \mu_g =X_{\mu}\beta_{g,\mu}, \\
-        logit \pi_g =X_{\pi}\beta_{g,\pi}, \\ \log \theta_g = \beta_{g,\theta},
+        \log \mu_g =X_{\mu}\beta_{g,\mu},
+        logit \pi_g =X_{\pi}\beta_{g,\pi}, \log \theta_g = \beta_{g,\theta},
 $$
 where $\mu_g$ is the mean of subject $g$, $X_{\mu}$, $X_{\pi}$ are feature matrices, $\beta_{g,\mu}$ and $\beta_{g,\pi}$ are coefficients for each subject $g$.
 

@@ -195,6 +195,8 @@ In [`./tests`](tests/), we provide tests for each of the 7 models:
 
 ## Troubleshooting
 
+### Run on Apple silicon
+
 To run TensorFlow on Apple silicon (M1, M2, etc), install TensorFlow using the following:
 
 `conda install -c apple tensorflow-deps`
@@ -203,6 +205,8 @@ To run TensorFlow on Apple silicon (M1, M2, etc), install TensorFlow using the f
 
 `python -m pip install tensorflow-metal==0.5.1`
 
+
+### PyStan installation
 
 If `pystan` cannot be installed, try using `pystan==2.19.1.1` or create a new conda environment using the following:
 

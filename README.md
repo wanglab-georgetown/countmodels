@@ -213,8 +213,8 @@ If `pystan` cannot be installed, try using `pystan==2.19.1.1` or create a new co
 `conda create --name countmodels python==3.9.13 pystan==2.19.1.1`
 
 
-## References
-Cui, T., Wang, T. A Comprehensive Assessment of Hurdle and Zero-inflated Models for Single Cell RNA-sequencing Analysis, Briefings in Bioinformatics, 2023.
+## Reference
+Cui, T., Wang, T. [A Comprehensive Assessment of Hurdle and Zero-inflated Models for Single Cell RNA-sequencing Analysis](https://doi.org/10.1093/bib/bbad272), Briefings in Bioinformatics, July 2023. https://doi.org/10.1093/bib/bbad272
 
 ## Support and Contribution
 If you encounter any bugs while using the code, please don't hesitate to create an issue on GitHub here.
